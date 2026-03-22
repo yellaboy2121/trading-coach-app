@@ -97,7 +97,14 @@ export function Dashboard({ setActiveTab }) {
         <h2>🔴 Live Alerts</h2>
         {alertsLoading ? (
           <div className="loading-alert">
-            <p>Connecting to alert feed...</p>
+            <p>🔗 Connecting to Railway backend...</p>
+          </div>
+        ) : alertsLoading === false && !recentAlerts.length && !alertsLoading ? (
+          <div className="no-alert">
+            <p>⏳ Waiting for live alerts from TradingView...</p>
+            <p className="alert-instructions">
+              Backend URL: <code>trading-coach-app-production.up.railway.app</code>
+            </p>
           </div>
         ) : recentAlerts && recentAlerts.length > 0 ? (
           <div className="alerts-list">

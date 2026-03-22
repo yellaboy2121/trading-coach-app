@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1774199189052",
+    "timestamp": "2026-03-22T17:06:29.052Z",
+    "ticker": "AAPL",
+    "bias": "Long",
+    "confidence": 85,
+    "risk": "Low",
+    "message": "Strong bullish setup"
+  },
+  {
+    "id": "1774198721886",
+    "timestamp": "2026-03-22T16:58:41.886Z",
+    "ticker": "AAPL",
+    "bias": "Long",
+    "confidence": 85,
+    "risk": "Low",
+    "message": "Strong bullish engulfing pattern"
+  },
+  {
+    "id": "test-1",
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "ticker": "AAPL",
+    "bias": "Long",
+    "confidence": 85,
+    "risk": "Low",
+    "message": "Strong bullish engulfing pattern on support with high volume confirmation"
+  },
+  {
+    "id": "test-2",
+    "timestamp": "2026-03-22T11:45:00.000Z",
+    "ticker": "TSLA",
+    "bias": "Short",
+    "confidence": 72,
+    "risk": "Medium",
+    "message": "Bearish divergence with upper wick rejection at resistance level"
+  }
+]

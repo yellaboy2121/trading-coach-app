@@ -1,0 +1,17 @@
+.page-content {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-content h1 {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+}
+
+.page-content p {
+  font-size: 16px;
+  color: var(--text);
+  margin: 0;
+}

@@ -1,0 +1,35 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+.nav-button {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+
+  &:active {
+    background: var(--accent-bg);
+  }
+
+  &.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+}

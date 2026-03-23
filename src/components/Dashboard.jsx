@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from 'react'
 import '../styles/Dashboard.css'
 import { useAlerts } from '../hooks/useAlerts'
+import NotificationControls from './NotificationControls'
 
 export function Dashboard({ setActiveTab }) {
   const [latestAnalysis, setLatestAnalysis] = useState(null)
@@ -90,6 +92,7 @@ export function Dashboard({ setActiveTab }) {
 
   return (
     <div className="page-content dashboard-page">
+      <NotificationControls />
       <h1>Dashboard</h1>
 
       {/* Live Alerts Section */}

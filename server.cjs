@@ -1,3 +1,62 @@
+// --- Web Push Notification Setup ---
+const webpush = require('web-push');
+const subscriptionsFile = path.join(__dirname, 'push_subscriptions.json');
+
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    'mailto:your@email.com',
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY
+  );
+}
+
+function loadSubscriptions() {
+  try {
+    return JSON.parse(fs.readFileSync(subscriptionsFile, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+function saveSubscriptions(subs) {
+  fs.writeFileSync(subscriptionsFile, JSON.stringify(subs, null, 2));
+}
+
+// Save push subscription
+app.post('/api/subscribe', express.json(), (req, res) => {
+  const sub = req.body;
+  const subs = loadSubscriptions();
+  if (!subs.find(s => s.endpoint === sub.endpoint)) {
+    subs.push(sub);
+    saveSubscriptions(subs);
+  }
+  res.json({ success: true });
+});
+
+// Send test push notification
+app.post('/api/send-test-push', async (req, res) => {
+  const subs = loadSubscriptions();
+  const payload = JSON.stringify({
+    title: 'Trading Coach Alert',
+    body: 'This is a real push notification!',
+    icon: '/icons/icon-192.png'
+  });
+  let success = 0;
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(sub, payload);
+      success++;
+    } catch (e) {
+      // Remove invalid subscriptions
+      if (e.statusCode === 410 || e.statusCode === 404) {
+        saveSubscriptions(subs.filter(s => s.endpoint !== sub.endpoint));
+      }
+    }
+  }
+  res.json({ sent: success });
+});
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -96,6 +155,38 @@ app.post('/api/alerts', (req, res) => {
 
   console.log(`📈 Alert: ${alert.ticker} ${alert.bias} ${alert.confidence}%`);
   res.json({ success: true, alert });
+});
+
+
+// --- TradingView Market State Webhook Route ---
+const STATE_LABELS = {
+  consolidating: 'CONSOLIDATING',
+  at_break_point: 'AT BREAK POINT',
+  breakout_up: 'BREAKOUT UP',
+  breakout_down: 'BREAKOUT DOWN',
+  failed_break: 'FAILED BREAK',
+};
+const TRADINGVIEW_STATE_SECRET = process.env.TRADINGVIEW_STATE_SECRET;
+
+app.post('/api/tradingview-state', (req, res) => {
+  const { token, ticker, price, state, message } = req.body || {};
+  if (!token || token !== TRADINGVIEW_STATE_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  if (!ticker || !price || !state || !STATE_LABELS[state]) {
+    return res.status(400).json({ error: 'Invalid payload' });
+  }
+  const event = {
+    timestamp: new Date().toISOString(),
+    ticker,
+    price,
+    state,
+    message: message || '',
+  };
+  alerts.unshift(event);
+  if (alerts.length > 100) alerts.pop();
+  saveAlerts();
+  return res.json({ success: true, label: STATE_LABELS[state] });
 });
 
 // GET /api/alerts/latest - get most recent alert

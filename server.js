@@ -1,3 +1,33 @@
+// --- TradingView Market State Webhook Route ---
+const STATE_LABELS = {
+  consolidating: 'CONSOLIDATING',
+  at_break_point: 'AT BREAK POINT',
+  breakout_up: 'BREAKOUT UP',
+  breakout_down: 'BREAKOUT DOWN',
+  failed_break: 'FAILED BREAK',
+};
+const TRADINGVIEW_STATE_SECRET = process.env.TRADINGVIEW_STATE_SECRET;
+
+app.post('/api/tradingview-state', (req, res) => {
+  const { token, ticker, price, state, message } = req.body || {};
+  if (!token || token !== TRADINGVIEW_STATE_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  if (!ticker || !price || !state || !STATE_LABELS[state]) {
+    return res.status(400).json({ error: 'Invalid payload' });
+  }
+  const event = {
+    timestamp: new Date().toISOString(),
+    ticker,
+    price,
+    state,
+    message: message || '',
+  };
+  alerts.unshift(event);
+  if (alerts.length > 100) alerts = alerts.slice(0, 100);
+  saveAlerts();
+  return res.json({ success: true, label: STATE_LABELS[state] });
+});
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';

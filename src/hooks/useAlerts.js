@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const BACKEND_URL = 'https://trading-coach-app-production.up.railway.app'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 
 export function useAlerts() {
   const [latestAlert, setLatestAlert] = useState(null)

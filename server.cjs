@@ -1,4 +1,5 @@
 
+const path = require('path');
 // --- Web Push Notification Setup ---
 const webpush = require('web-push');
 const subscriptionsFile = path.join(__dirname, 'push_subscriptions.json');
@@ -61,7 +62,6 @@ app.post('/api/send-test-push', async (req, res) => {
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;

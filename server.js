@@ -8,25 +8,51 @@ const STATE_LABELS = {
 };
 const TRADINGVIEW_STATE_SECRET = process.env.TRADINGVIEW_STATE_SECRET;
 
-app.post('/api/tradingview-state', (req, res) => {
-  const { token, ticker, price, state, message } = req.body || {};
-  if (!token || token !== TRADINGVIEW_STATE_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
+app.post('/api/tradingview-state', async (req, res) => {
+  console.log('[tv-state] route hit');
+  try {
+    const { token, ticker, price, state, message } = req.body || {};
+    console.log('[tv-state] body:', req.body);
+    if (!token || token !== TRADINGVIEW_STATE_SECRET) {
+      console.log('[tv-state] invalid token');
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (!ticker || !price || !state || !STATE_LABELS[state]) {
+      console.log('[tv-state] invalid payload');
+      return res.status(400).json({ error: 'Invalid payload' });
+    }
+    const event = {
+      timestamp: new Date().toISOString(),
+      ticker,
+      price,
+      state,
+      message: message || '',
+    };
+    // Write to alerts.json safely
+    let fileAlerts = [];
+    try {
+      if (fs.existsSync(alertsFile)) {
+        fileAlerts = JSON.parse(fs.readFileSync(alertsFile, 'utf8'));
+        if (!Array.isArray(fileAlerts)) fileAlerts = [];
+      }
+    } catch (e) {
+      console.log('[tv-state] error reading alertsFile:', e);
+      fileAlerts = [];
+    }
+    fileAlerts.unshift(event);
+    if (fileAlerts.length > 100) fileAlerts = fileAlerts.slice(0, 100);
+    try {
+      fs.writeFileSync(alertsFile, JSON.stringify(fileAlerts, null, 2));
+      console.log('[tv-state] wrote to alertsFile');
+    } catch (e) {
+      console.log('[tv-state] error writing alertsFile:', e);
+      return res.status(500).json({ error: 'Failed to write alerts file' });
+    }
+    return res.json({ success: true, label: STATE_LABELS[state] });
+  } catch (err) {
+    console.log('[tv-state] fatal error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-  if (!ticker || !price || !state || !STATE_LABELS[state]) {
-    return res.status(400).json({ error: 'Invalid payload' });
-  }
-  const event = {
-    timestamp: new Date().toISOString(),
-    ticker,
-    price,
-    state,
-    message: message || '',
-  };
-  alerts.unshift(event);
-  if (alerts.length > 100) alerts = alerts.slice(0, 100);
-  saveAlerts();
-  return res.json({ success: true, label: STATE_LABELS[state] });
 });
 import express from 'express';
 import cors from 'cors';

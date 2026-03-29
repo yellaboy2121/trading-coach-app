@@ -26,6 +26,7 @@ function saveSubscriptions(subs) {
   fs.writeFileSync(subscriptionsFile, JSON.stringify(subs, null, 2));
 }
 
+// ...existing code...
 // Save push subscription
 app.post('/api/subscribe', express.json(), (req, res) => {
   const sub = req.body;

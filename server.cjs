@@ -1,5 +1,4 @@
 
-const path = require('path');
 // --- Web Push Notification Setup ---
 const webpush = require('web-push');
 const subscriptionsFile = path.join(__dirname, 'push_subscriptions.json');
